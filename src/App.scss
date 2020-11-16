@@ -1,6 +1,12 @@
 $accentColor: #3D5AFE;
 $accentColor2: #283593;
 
+@mixin mobile {
+  @media screen and (max-width: 500px) {
+    @content;
+  }
+}
+
 @font-face{
   font-family: 'JetBrainsMono';
   src: url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff2/JetBrainsMono-Regular.woff2') format('woff2'),
@@ -32,6 +38,11 @@ body {
       'dropzone' auto / 1fr;
   flex-direction: column;
   --file-drop-color: var(--accent-color);
+
+  @include mobile {
+    padding: 20px;
+  }
+
   &::after {
     font-size: 24px;
     line-height: 32px;
@@ -42,6 +53,13 @@ body {
     grid-template:
         'output preview' 1fr
         'dropzone dropzone' auto / 1fr auto;
+
+    @include mobile {
+      grid-template:
+          'output' 1fr
+          'preview' auto
+          'dropzone' auto / 1fr;
+    }
   }
 
   &.is-zero {
@@ -68,6 +86,10 @@ body {
   padding: 28px;
   border: 2px solid currentColor;
   color: var(--accent-color);
+
+  @include mobile {
+    padding: 16px;
+  }
 
   .copy {
     max-width: 320px;
@@ -129,6 +151,10 @@ body {
   overflow-y: auto;
   display: flex;
 
+  @include mobile {
+    padding: 16px;
+  }
+
   h2 {
     margin: 0 0 16px 0;
     font-weight: 400;
@@ -160,8 +186,8 @@ body {
   align-self: stretch;
   justify-self: stretch;
   min-width: 200px;
+  min-height: 120px;
   position: relative;
-  min-height: 0;
 
   img {
     max-width: 100%;
