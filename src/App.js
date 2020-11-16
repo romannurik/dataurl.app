@@ -52,7 +52,7 @@ export default function App() {
     };
 
     window.addEventListener("paste", pasteHandler, false);
-    return () => window.removeEventListener("paste", this._pasteHandler, false);
+    return () => window.removeEventListener("paste", pasteHandler, false);
   }, []);
 
   return (
@@ -85,7 +85,8 @@ export default function App() {
           <p>
             You'll get a Data URL with the file's contents
             to use in an <code>&lt;img&gt;</code> tag, a CSS <code>url(...)</code>,
-            etc.
+            etc. This is all done in your browser &mdash; your file is never
+            uploaded anywhere.
           </p>
         </div>}
         <input type="file"
