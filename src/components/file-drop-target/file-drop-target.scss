@@ -1,0 +1,28 @@
+.file-drop-target {
+  position: relative;
+
+  &.is-active::after {
+    content: "Drop file";
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--file-drop-color, red);
+    opacity: .95;
+    color: #fff;
+    animation: file-drop-oscillate 0.7s ease-in-out alternate-reverse infinite;
+  }
+
+  @keyframes file-drop-oscillate {
+    from {
+      opacity: .95;
+    }
+    to {
+      opacity: .75;
+    }
+  }
+}
