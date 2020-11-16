@@ -68,7 +68,7 @@ export default function App() {
         <div className="output"
           onClick={ () => selectNode(outRef.current) }>
           <div className="output-main">
-            <h2>Here's your Data URL!</h2>
+            <h2>Here's your Data URL:</h2>
             <div className="output-data-url" ref={outRef}>{out}</div>
           </div>
         </div>
@@ -83,7 +83,7 @@ export default function App() {
         {!out && <div className="copy">
           <h1>Drop, paste or select a file</h1>
           <p>
-            You'll get a Data URL with the file's contents
+            You'll get a <code>data:</code> URL with the file's contents
             to use in an <code>&lt;img&gt;</code> tag, a CSS <code>url(...)</code>,
             etc. This is all done in your browser &mdash; your file is never
             uploaded anywhere.

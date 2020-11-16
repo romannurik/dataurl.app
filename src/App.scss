@@ -1,3 +1,6 @@
+$accentColor: #3D5AFE;
+$accentColor2: #283593;
+
 @font-face{
   font-family: 'JetBrainsMono';
   src: url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff2/JetBrainsMono-Regular.woff2') format('woff2'),
@@ -10,8 +13,8 @@
 :root {
   font-family: Inter, sans-serif;
   background-color: #fafafa;
-  --accent-color: #3D5AFE;
-  --accent-color-2: #283593;
+  --accent-color: #{$accentColor};
+  --accent-color-2: #{$accentColor2};
 }
 
 body {
@@ -79,6 +82,9 @@ body {
 
   code {
     font-family: JetBrainsMono, monospace;
+    background-color: rgba($accentColor, .15);
+    border-radius: 2px;
+    padding: 0 2px;
   }
 
   p {
