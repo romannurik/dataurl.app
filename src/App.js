@@ -44,7 +44,7 @@ export default function App() {
         // TODO: check for png/gif?
         processFile(clipboardData.files[0]);
       } else {
-        for (let item of Array.from(clipboardData.items).filter(({type}) => type == 'text/plain')) {
+        for (let item of Array.from(clipboardData.items).filter(({type}) => type === 'text/plain')) {
           item.getAsString(str => processText(str));
           break;
         }
@@ -74,7 +74,7 @@ export default function App() {
         </div>
       </>}
       {out && isImage && <div className="preview-image">
-        <img src={out} />
+        <img src={out} alt="Preview" />
       </div>}
       <div className='dropzone'>
         {out && <>

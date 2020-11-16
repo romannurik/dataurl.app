@@ -49,10 +49,7 @@ export class FileDropTarget extends React.Component {
     let fileNameRegexp = this.props.regex || /.*/;
 
     this.setState({ isActive: false });
-    if (
-      ev.dataTransfer.files.length == 1 &&
-      ev.dataTransfer.files[0].name.match(fileNameRegexp)
-    ) {
+    if (ev.dataTransfer.files.length === 1 && ev.dataTransfer.files[0].name.match(fileNameRegexp)) {
       this.props.onDrop(ev.dataTransfer.files[0]);
     } else {
       alert(this.props.invalidFileMessage);
