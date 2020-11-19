@@ -1,5 +1,6 @@
-$accentColor: #3D5AFE;
-$accentColor2: #283593;
+@function color-to-rgb-tuple($color) {
+  @return red($color), green($color), blue($color);
+}
 
 @mixin mobile {
   @media screen and (max-width: 500px) {
@@ -7,7 +8,7 @@ $accentColor2: #283593;
   }
 }
 
-@font-face{
+@font-face {
   font-family: 'JetBrainsMono';
   src: url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff2/JetBrainsMono-Regular.woff2') format('woff2'),
     url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff/JetBrainsMono-Regular.woff') format('woff'),
@@ -17,10 +18,19 @@ $accentColor2: #283593;
 }
 
 :root {
-  font-family: Inter, sans-serif;
-  background-color: #fafafa;
+  $accentColor: #3D5AFE;
+  $accentColor2: #3949AB;
+  $accentColor3: #283593;
+  
+  font-family: var(--font);
+  background-color: var(--page-bg-color);
+  --page-bg-color: #fafafa;
+  --accent-color-rgb: #{color-to-rgb-tuple($accentColor)};
   --accent-color: #{$accentColor};
   --accent-color-2: #{$accentColor2};
+  --accent-color-3: #{$accentColor3};
+  --warning-color: #FF3D00;
+  --font: Inter, sans-serif;
 }
 
 body {
@@ -30,6 +40,7 @@ body {
 .main {
   padding: 40px;
   height: 100vh;
+  height: calc(var(--vh) * 100);
   box-sizing: border-box;
   gap: 20px;
   display: grid;
@@ -91,8 +102,9 @@ body {
     padding: 16px;
   }
 
-  .copy {
-    max-width: 320px;
+  &[disabled] {
+    opacity: .5;
+    pointer-events: none;
   }
 
   h1 {
@@ -104,7 +116,7 @@ body {
 
   code {
     font-family: JetBrainsMono, monospace;
-    background-color: rgba($accentColor, .15);
+    background-color: rgba(var(--accent-color-rgb), .15);
     border-radius: 2px;
     padding: 0 2px;
   }
@@ -115,7 +127,8 @@ body {
   }
 
   &:focus-within {
-    color: var(--accent-color-2);
+    color: var(--accent-color-3);
+    background-color: rgba(var(--accent-color-rgb), .05);
   }
 }
 
@@ -124,9 +137,31 @@ body {
   height: 100%;
   box-sizing: border-box;
 
+  .copy {
+    max-width: 320px;
+  }
+
+  svg {
+    width: 48px;
+    height: 48px;
+    stroke-width: 1px;
+    margin: 0 auto 8px auto;
+    display: block;
+  }
+
   h1 {
     font-size: 24px;
     line-height: 32px;
+  }
+}
+
+.main:not(.is-zero) .dropzone {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  svg {
+    margin-right: 8px;
   }
 }
 
@@ -154,13 +189,63 @@ body {
   @include mobile {
     padding: 16px;
   }
+}
+
+.output-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 0 0 16px 0;
 
   h2 {
-    margin: 0 0 16px 0;
-    font-weight: 400;
+    margin: 0;
+    font-weight: 500;
     color: var(--accent-color);
-    font-size: 13px;
-    line-height: 20px;
+    font-size: 14px;
+    line-height: 24px;
+    flex: 1;
+
+    &.warning {
+      color: var(--warning-color);
+    }
+  }
+}
+
+.btn {
+  --color: var(--accent-color);
+  appearance: none;
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 20px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  background-color: var(--color);
+  border: 0;
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  color: #fff;
+  font-weight: 500;
+  outline: 0;
+
+  svg {
+    margin: 0 8px 0 -2px;
+  }
+
+  &:hover,
+  &:focus {
+    --color: var(--accent-color-2);
+  }
+
+  &:active {
+    --color: var(--accent-color-3);
+  }
+
+  &:focus {
+    box-shadow:
+        0 0 0 2px var(--color) inset,
+        0 0 0 4px rgba(#fff, .5) inset;
   }
 }
 
