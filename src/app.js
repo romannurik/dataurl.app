@@ -46,6 +46,7 @@ export default function App() {
 
     window.addEventListener("paste", pasteHandler, false);
     return () => window.removeEventListener("paste", pasteHandler, false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   let processText = str => {
