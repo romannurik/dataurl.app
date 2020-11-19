@@ -5,8 +5,8 @@ import "./app.scss";
 import { FileDropTarget } from "./components/file-drop-target/file-drop-target";
 import filesize from 'filesize';
 
-const WARNING_URL_LENGTH = 500 * 1024; // KB
-const ERROR_FILE_SIZE = 2 * 1024 * 1024; // MB
+const WARNING_URL_LENGTH = 500 /* KB */ * 1024;
+const ERROR_FILE_SIZE = 2 /* MB */ * 1024 * 1024;
 
 // do this at the root to avoid flash of un-layout'd content
 (() => {
@@ -18,6 +18,7 @@ const ERROR_FILE_SIZE = 2 * 1024 * 1024; // MB
 export default function App() {
   let outRef = React.useRef();
   let [out, setOut] = React.useState(null);
+  let [isLoading, setIsLoading] = React.useState(false);
   let [isImage, setIsImage] = React.useState(false);
 
   React.useEffect(() => {
@@ -28,6 +29,10 @@ export default function App() {
 
   React.useEffect(() => {
     let pasteHandler = event => {
+      if (isLoading) {
+        return;
+      }
+
       let clipboardData = event.clipboardData;
       if (clipboardData.files && clipboardData.files.length) {
         processFile(clipboardData.files[0]);
@@ -65,10 +70,17 @@ export default function App() {
 
     const reader = new FileReader();
     reader.addEventListener('load', () => {
+      setIsLoading(false);
       setOut(reader.result);
       setIsImage(file.type.match(/image\//));
     }, false);
 
+    reader.addEventListener('error', (e) => {
+      setIsLoading(false);
+      alert(`Couldn't load the file. According to your browser: "${reader.error.message}"`);
+    }, false);
+
+    setIsLoading(true);
     reader.readAsDataURL(file);
   };
 
@@ -84,6 +96,7 @@ export default function App() {
           'is-zero': !out,
           'is-image': isImage,
         })}
+        disabled={isLoading}
         regex={/\.(png|webp|jpg|svg|txt)$/}
         invalidFileMessage="Bad file"
         onDrop={file => processFile(file)}>
@@ -109,7 +122,7 @@ export default function App() {
       {out && isImage && <div className="preview-image">
         <img src={out} alt="Preview" />
       </div>}
-      <div className='dropzone'>
+      <div className='dropzone' disabled={isLoading}>
         {out && <>
           <FileIcon />
           <h1>Drop, paste or select another file</h1>
@@ -128,7 +141,8 @@ export default function App() {
           onChange={ evt => {
             processFile(evt.target.files[0]);
             evt.target.value = null;
-          }} />
+          }}
+          disabled={isLoading} />
       </div>
     </FileDropTarget>
   );

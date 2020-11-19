@@ -102,6 +102,11 @@ body {
     padding: 16px;
   }
 
+  &[disabled] {
+    opacity: .5;
+    pointer-events: none;
+  }
+
   h1 {
     margin: 0;
     font-weight: 500;
