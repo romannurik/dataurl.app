@@ -1,12 +1,47 @@
 import cn from 'classnames';
 import React from "react";
-import "./App.scss";
+import { Clipboard as ClipboardIcon, File as FileIcon } from 'react-feather';
+import "./app.scss";
 import { FileDropTarget } from "./components/file-drop-target/file-drop-target";
+import filesize from 'filesize';
+
+const WARNING_URL_LENGTH = 500 * 1024; // KB
+const ERROR_FILE_SIZE = 2 * 1024 * 1024; // MB
+
+// do this at the root to avoid flash of un-layout'd content
+(() => {
+  let update = () => document.body.style.setProperty('--vh', `${window.innerHeight / 100}px`);
+  update();
+  window.addEventListener('resize', update, false);
+})();
 
 export default function App() {
   let outRef = React.useRef();
   let [out, setOut] = React.useState(null);
   let [isImage, setIsImage] = React.useState(false);
+
+  React.useEffect(() => {
+    if (out && outRef.current) {
+      selectNode(outRef.current);
+    }
+  }, [out]);
+
+  React.useEffect(() => {
+    let pasteHandler = event => {
+      let clipboardData = event.clipboardData;
+      if (clipboardData.files && clipboardData.files.length) {
+        processFile(clipboardData.files[0]);
+      } else {
+        let textItem = Array.from(clipboardData.items).find(({type}) => type === 'text/plain');
+        if (textItem) {
+          textItem.getAsString(str => processText(str));
+        }
+      }
+    };
+
+    window.addEventListener("paste", pasteHandler, false);
+    return () => window.removeEventListener("paste", pasteHandler, false);
+  }, []);
 
   let processText = str => {
     let type = 'text/plain';
@@ -22,6 +57,12 @@ export default function App() {
   };
 
   let processFile = file => {
+    if (file.size > ERROR_FILE_SIZE) {
+      alert(`The file you uploaded is too big (${filesize(file.size)}). ` +
+            `Upload files smaller than ${filesize(ERROR_FILE_SIZE)}.`);
+      return;
+    }
+
     const reader = new FileReader();
     reader.addEventListener('load', () => {
       setOut(reader.result);
@@ -31,29 +72,11 @@ export default function App() {
     reader.readAsDataURL(file);
   };
 
-  React.useEffect(() => {
-    if (out && outRef.current) {
-      selectNode(outRef.current);
+  let setClipboard = () => {
+    if (out) {
+      navigator.clipboard.writeText(out);
     }
-  }, [out]);
-
-  React.useEffect(() => {
-    let pasteHandler = event => {
-      let clipboardData = event.clipboardData;
-      if (clipboardData.files && clipboardData.files.length) {
-        // TODO: check for png/gif?
-        processFile(clipboardData.files[0]);
-      } else {
-        for (let item of Array.from(clipboardData.items).filter(({type}) => type === 'text/plain')) {
-          item.getAsString(str => processText(str));
-          break;
-        }
-      }
-    };
-
-    window.addEventListener("paste", pasteHandler, false);
-    return () => window.removeEventListener("paste", pasteHandler, false);
-  }, []);
+  };
 
   return (
     <FileDropTarget
@@ -65,11 +88,21 @@ export default function App() {
         invalidFileMessage="Bad file"
         onDrop={file => processFile(file)}>
       {out && <>
-        <div className="output"
-          onClick={ () => selectNode(outRef.current) }>
+        <div className="output">
           <div className="output-main">
-            <h2>Here's your Data URL:</h2>
-            <div className="output-data-url" ref={outRef}>{out}</div>
+            <div className="output-header">
+              {out.length < WARNING_URL_LENGTH && <h2>Here's your data URL:</h2>}
+              {out.length >= WARNING_URL_LENGTH && <h2 className="warning">
+                Your data URL might be too long ({ filesize(out.length) })
+              </h2>}
+              <button className="btn" onClick={ setClipboard }>
+                <ClipboardIcon />
+                Copy
+              </button>
+            </div>
+            <div className="output-data-url"
+                ref={outRef}
+                onClick={ () => selectNode(outRef.current) }>{out}</div>
           </div>
         </div>
       </>}
@@ -78,9 +111,11 @@ export default function App() {
       </div>}
       <div className='dropzone'>
         {out && <>
+          <FileIcon />
           <h1>Drop, paste or select another file</h1>
         </>}
         {!out && <div className="copy">
+          <FileIcon />
           <h1>Drop, paste or select a file</h1>
           <p>
             You'll get a <code>data:</code> URL with the file's contents
