@@ -1,6 +1,6 @@
 import cn from 'classnames';
 import React from "react";
-import { Clipboard as ClipboardIcon, File as FileIcon } from 'react-feather';
+import { Clipboard as ClipboardIcon, Check as CheckIcon, File as FileIcon } from 'react-feather';
 import "./app.scss";
 import { FileDropTarget } from "./components/file-drop-target/file-drop-target";
 import filesize from 'filesize';
@@ -19,6 +19,7 @@ export default function App() {
   let outRef = React.useRef();
   let [out, setOut] = React.useState(null);
   let [isLoading, setIsLoading] = React.useState(false);
+  let [isConfirmingCopy, setIsConfirmingCopy] = React.useState(false);
   let [isImage, setIsImage] = React.useState(false);
 
   React.useEffect(() => {
@@ -85,9 +86,18 @@ export default function App() {
     reader.readAsDataURL(file);
   };
 
-  let setClipboard = () => {
+  let setClipboard = async () => {
     if (out) {
-      navigator.clipboard.writeText(out);
+      await navigator.clipboard.writeText(out);
+      if (App.ccTimeout_) {
+        clearTimeout(App.ccTimeout_);
+      }
+
+      App.ccTimeout_ = setIsConfirmingCopy(true);
+      setTimeout(() => {
+        setIsConfirmingCopy(false);
+        delete App.ccTimeout_;
+      }, 1500);
     }
   };
 
@@ -98,7 +108,7 @@ export default function App() {
           'is-image': isImage,
         })}
         disabled={isLoading}
-        regex={/\.(png|webp|jpg|svg|txt)$/}
+        regex={/.*/}
         invalidFileMessage="Bad file"
         onDrop={file => processFile(file)}>
       {out && <>
@@ -107,11 +117,20 @@ export default function App() {
             <div className="output-header">
               {out.length < WARNING_URL_LENGTH && <h2>Here's your data URL:</h2>}
               {out.length >= WARNING_URL_LENGTH && <h2 className="warning">
-                Your data URL might be too long ({ filesize(out.length) })
+                Your data URL might be too long ({ filesize(out.length) }).
+                {isImage && <>{' '}
+                  Try <a href="https://squoosh.app/" target="_blank">Squooshing</a> first.
+                </>}
               </h2>}
-              <button className="btn" onClick={ setClipboard }>
-                <ClipboardIcon />
-                Copy
+              <button
+                  disabled={isConfirmingCopy}
+                  className={cn('btn', {'is-confirming': isConfirmingCopy})}
+                  onClick={ setClipboard }>
+                {isConfirmingCopy && <CheckIcon className="btn-confirming-icon" />}
+                <div className="btn-content">
+                  <ClipboardIcon className="btn-start-icon" />
+                  Copy
+                </div>
               </button>
             </div>
             <div className="output-data-url"
@@ -139,6 +158,7 @@ export default function App() {
           </p>
         </div>}
         <input type="file"
+          title=" "
           onChange={ evt => {
             processFile(evt.target.files[0]);
             evt.target.value = null;

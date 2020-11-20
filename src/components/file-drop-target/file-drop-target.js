@@ -8,7 +8,7 @@ export class FileDropTarget extends React.Component {
   };
 
   onDragEnter = ev => {
-    if (this.props.disabled) {
+    if (this.props.disabled || !dragEventHasFile(ev)) {
       return;
     }
 
@@ -36,13 +36,18 @@ export class FileDropTarget extends React.Component {
       clearTimeout(this.enterLeaveTimeout_);
       delete this.enterLeaveTimeout_;
     }
-    ev.dataTransfer.dropEffect = "copy";
+
+    if (dragEventHasFile(ev)) {
+      ev.dataTransfer.dropEffect = "copy";
+    } else {
+      ev.dataTransfer.dropEffect = "none";
+    }
   };
 
   onDrop = ev => {
     ev.stopPropagation();
     ev.preventDefault();
-    if (this.props.disabled) {
+    if (this.props.disabled || !dragEventHasFile(ev)) {
       return;
     }
 
@@ -71,4 +76,9 @@ export class FileDropTarget extends React.Component {
       </div>
     );
   }
+}
+
+function dragEventHasFile(ev) {
+  // .files isn't always populated seemingly
+  return [...ev.dataTransfer.items].find(i => i.kind === 'file');
 }
