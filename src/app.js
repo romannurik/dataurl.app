@@ -119,7 +119,9 @@ export default function App() {
               {out.length >= WARNING_URL_LENGTH && <h2 className="warning">
                 Your data URL might be too long ({ filesize(out.length) }).
                 {isImage && <>{' '}
-                  Try <a href="https://squoosh.app/" target="_blank">Squooshing</a> first.
+                  Try <a href="https://squoosh.app/"
+                    target="_blank"
+                    rel="noreferrer">Squooshing</a> first.
                 </>}
               </h2>}
               <button
