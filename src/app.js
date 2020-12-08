@@ -65,8 +65,8 @@ export default function App() {
 
   let processFile = file => {
     if (file.size > ERROR_FILE_SIZE) {
-      alert(`The file you uploaded is too big (${filesize(file.size)}). ` +
-            `Upload files smaller than ${filesize(ERROR_FILE_SIZE)}.`);
+      alert(`The file you chose is too big (${filesize(file.size)}). ` +
+            `Get your file down to ${filesize(ERROR_FILE_SIZE)} and try again.`);
       return;
     }
 
